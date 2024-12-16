@@ -5,11 +5,14 @@ import json
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-# Template completo com todas as seções incorporadas
-with open('project/frontend/template.html', 'r', encoding='utf8') as file:
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+template_path = os.path.join(current_dir, 'template.html')
+with open(template_path, 'r', encoding='utf8') as file:
     TEMPLATE = file.read()
 
-with open('project/frontend/crud_config.json', 'r', encoding='utf8') as file:
+config_path = os.path.join(current_dir, 'crud_config.json')
+with open(config_path, 'r', encoding='utf8') as file:
     CRUD_CONFIGS = json.load(file)
 
 @app.route('/', methods=['GET', 'POST'])
