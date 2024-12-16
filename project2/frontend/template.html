@@ -1,8 +1,4 @@
 <!--
-- Esse código é uma estrutura HTML com integração de JavaScript e Jinja2 (um motor de templates para Python). 
-
-- Jinja2 serve para permitir que as informações trocadas entre o Python e as páginas HTML sejam feitas de forma mais simples e intuitiva 
-
 - Integração Jinja2 e JavaScript: O código faz uso da sintaxe de template Jinja2 (como {{ campo.label }} e {% for campo in campos %}) 
 para gerar dinamicamente o HTML com base nos dados do backend. As variáveis do Python são passadas para o front-end, permitindo que a interface se adapte ao contexto.
 
@@ -24,8 +20,8 @@ necessidade de recarregar completamente a página.-->
         <div class="container">
             <a class="navbar-brand" href="/">Sistema de Gestão</a>
             
-            <!-- Se o usuário estiver autenticado (indicado pela presença de session.get('token')), 
-            ele verá os links para categorias, produtos e fornecedores. Além disso, um botão de "Sair" será exibido. -->
+            <!-- Se o usuário estiver autenticado (indicado pelo session.get('token')), 
+            ele verá os links para categorias, produtos e fornecedores e botão de "Sair". -->
             
             {% if session.get('token') %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
