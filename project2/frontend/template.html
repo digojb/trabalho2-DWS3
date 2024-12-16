@@ -1,6 +1,20 @@
+<!--
+- Esse código é uma estrutura HTML com integração de JavaScript e Jinja2 (um motor de templates para Python). 
+
+- Jinja2 serve para permitir que as informações trocadas entre o Python e as páginas HTML sejam feitas de forma mais simples e intuitiva 
+
+- Integração Jinja2 e JavaScript: O código faz uso da sintaxe de template Jinja2 (como {{ campo.label }} e {% for campo in campos %}) 
+para gerar dinamicamente o HTML com base nos dados do backend. As variáveis do Python são passadas para o front-end, permitindo que a interface se adapte ao contexto.
+
+- Comunicação Assíncrona (AJAX): O código usa fetch para fazer chamadas assíncronas para a API,  o que permite que a página seja atualizada dinamicamente sem a 
+necessidade de recarregar completamente a página.-->
+
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Aqui, o título da página é configurado. Ele usa uma expressão Jinja2 ({{ titulo if titulo else 'Sistema de Gestão' }}), 
+    o que significa que, se a variável titulo estiver definida, ela será usada, caso contrário, será exibido "Sistema de Gestão". -->
+    
     <title>{{ titulo if titulo else 'Sistema de Gestão' }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -9,6 +23,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="/">Sistema de Gestão</a>
+            
+            <!-- Se o usuário estiver autenticado (indicado pela presença de session.get('token')), 
+            ele verá os links para categorias, produtos e fornecedores. Além disso, um botão de "Sair" será exibido. -->
+            
             {% if session.get('token') %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -59,10 +77,14 @@
                     </div>
                 </div>
             </div>
+        
         {% elif pagina == 'crud' %}
             <h2 class="mb-4">{{ titulo }}</h2>
 
-        <!-- Modal de Formulário -->
+       
+        <!-- Modal de Formulário
+         Essa parte do código é responsável pela criação de um modal (uma janela de diálogo) que é usado para adicionar ou editar uma entidade-->
+        
         <div class="modal fade" id="formModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -73,7 +95,10 @@
                     <div class="modal-body">
                         <form id="entityForm">
                             <input type="hidden" id="id">
-                            
+
+                            <!--O loop {% for campo in campos %} é usado para gerar os campos do formulário dinamicamente. 
+                            A lista campos é fornecida pelo Flask e contém informações sobre os campos que devem ser exibidos no formulário. 
+                            Cada campo pode ter atributos como id, label, type, e options (se for um select box).-->
                             {% for campo in campos %}
                             <div class="mb-3">
                                 <label for="{{ campo.id }}" class="form-label">{{ campo.label }}:</label>
@@ -90,27 +115,31 @@
                             </div>
                             {% endfor %}
                             
-                            <!-- Aqui, o container dos fornecedores será inserido no final do formulário -->
+                            <!-- Se o título da página for "Produtos", um bloco adicional é adicionado ao final do formulário. 
+                            Isso serve para exibir uma lista de fornecedores relacionados ao produto, usando checkboxes. -->
                             {% if titulo == 'Produtos' %}
                             <div class="mb-3">
                                 <label for="fornecedores" class="form-label">Fornecedores:</label>
                             </div>
                             <div id="fornecedores-container">
-                                <!-- Os checkboxes dos fornecedores serão inseridos aqui -->
+                            <!-- Os checkboxes dos fornecedores serão inseridos aqui -->
                             </div>
                             {% endif %}
 
                         </form>
-                    </div>
+                    </div>c
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" onclick="salvarEntidade()">Salvar</button>
+                        <button type="button" class="btn btn-primary" onclick="salvarEntidade()">Salvar</button> <!-- O botão "Salvar" chama a função salvarEntidade() 
+                        quando clicado. Essa função é definida no JavaScript e é responsável por coletar os dados do formulário, enviá-los ao servidor para serem salvos e depois fechar o modal.-->
                     </div>
                 </div>
             </div>
         </div>
 
-            <!-- Tabela de Dados -->
+            <!-- Tabela de Dados 
+             Após o modal, a página exibe uma tabela onde as entidades (categorias, produtos, etc.) são listadas. 
+             Os dados são carregados dinamicamente através de uma chamada para a API, e a tabela é atualizada com esses dados. -->
             <div class="card">
                 <div class="card-body">
                     <button class="btn btn-primary mb-3" onclick="novaEntidade()">Novo {{ titulo }}</button>
@@ -133,7 +162,7 @@
                 </div>
             </div>
 
-            
+            <!-- Esse modal exibe detalhes sobre a entidade selecionada. Aqui, os detalhes são extraídos da API e exibidos em um formato de lista (<dl>). -->
             <div class="modal fade" id="viewModal" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -152,6 +181,10 @@
                 </div>
             </div>
 
+            <!--O JavaScript neste código gerencia várias interações dinâmicas entre o front-end e o back-end. 
+            O código utiliza fetch para enviar requisições HTTP para o servidor. O backend, escrito em Python, 
+            processa essas requisições, executando as operações de CRUD (criar, ler, atualizar, excluir) com os dados.-->
+        
             <script>
             const API_URL = '/api/{{ endpoint }}';
             let editando = null;
@@ -162,6 +195,8 @@
                 document.getElementById('formModal').addEventListener('show.bs.modal', carregarFornecedores);
             });
 
+            //Essa função é chamada logo após o carregamento da página para preencher a tabela de dados. Ela faz uma requisição fetch para a API (usando a variável API_URL) e preenche a tabela com os resultados.
+            //Quando o título for "Produtos", ele também faz uma requisição para obter os fornecedores e mostra esses fornecedores na tabela.        
             async function carregarDados() {
                 try {
                     const response = await fetch(API_URL);
@@ -196,6 +231,8 @@
                 }
             }
 
+            //Quando o modal de criação ou edição de produtos é mostrado, a função carregarFornecedores é chamada. 
+            //Ela faz uma requisição fetch para a API de fornecedores e cria checkboxes para cada fornecedor disponível.
             async function carregarFornecedores() {
                 try {
                     const response = await fetch('/api/fornecedores');
@@ -241,15 +278,16 @@
                 }
             }
 
-            // Carrega fornecedores ao abrir o modal de produto
+            // Carrega fornecedores ao abrir o modal (janela) de produto.
             document.getElementById('formModal').addEventListener('show.bs.modal', carregarFornecedores);
 
+            //Quando o usuário clica no botão "Ver" em uma linha da tabela, é carregado os detalhes dessa entidade através de uma requisição fetch e exibe essas informações em um modal de detalhes.
             async function visualizarEntidade(id) {
                 try {
                     const response = await fetch(`${API_URL}/${id}`);
                     const data = await response.json();
                     
-                    // If this is the products page, fetch category name
+                    // Se for a pagina de produtos, carrega o nome das categorias.
                     if ('{{ endpoint }}' === 'produtos') {
                         const catResponse = await fetch(`/api/categorias/${data.categoria_id}`);
                         const catData = await catResponse.json();
@@ -276,6 +314,10 @@
                     alert('Erro ao carregar dados para visualização. Por favor, tente novamente.');
                 }
             }
+                
+            //A função novaEntidade() é usada para preparar e abrir o modal quando o usuário deseja criar um novo produto ou fornecedor. 
+            //Faz uma requisição para obter a lista de fornecedores e, caso consiga, preenche o campo de seleção (select) de fornecedores com esses dados.
+            //Ela garante que o formulário esteja limpo e com as informações atualizadas (como a lista de fornecedores) antes de o usuário começar a preenchê-lo.
             async function novaEntidade() {
                 editando = null;
                 document.getElementById('entityForm').reset();
@@ -295,6 +337,7 @@
                 new bootstrap.Modal(document.getElementById('formModal')).show();
             }
 
+            //Quando o usuário clica em "Editar", o formulário é preenchido com os dados da entidade selecionada, permitindo ao usuário modificar os valores. 
             async function editarEntidade(id) {
                 try {
                     const response = await fetch(`${API_URL}/${id}`);
@@ -311,6 +354,9 @@
                 }
             }
 
+            //Quando o usuário preenche o formulário e clica em "Salvar", a função salvarEntidade coleta todos os dados do formulário, 
+            //incluindo os fornecedores selecionados (se for o caso), e envia os dados para a API usando o método POST (para novos itens) ou PUT (para editar itens existentes).
+            //Após salvar com sucesso, o modal é fechado e os dados na tabela são recarregados.
             async function salvarEntidade() {
                 try {
                     const form = document.getElementById('entityForm');
