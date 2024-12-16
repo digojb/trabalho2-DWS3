@@ -2,6 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 
+#SQLAlchemy é um ORM (Object Relational Mapper) usado para interação com bancos de dados relacionais, como o PostgreSQL.
+#É a biblioteca que faz a conexão com o banco de dados e mapear as classes do Python para tabelas no banco.
+
 # Configurações do app
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://angelo:8zb8usf3aflo3ayy@44.219.162.7:5432/sistema_gestao'
